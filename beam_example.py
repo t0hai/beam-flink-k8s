@@ -7,7 +7,7 @@ import apache_beam.transforms.window as window
 def run():
     options = PipelineOptions([
         "--runner=FlinkRunner",
-        "--flink_version=1.15",
+        "--flink_version=1.14",
         "--flink_master=localhost:8081",
         "--environment_type=EXTERNAL",
         "--environment_config=localhost:50000"

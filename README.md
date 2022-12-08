@@ -36,7 +36,7 @@ kubectl apply -f jobmanager-session-deployment.yaml
 kubectl apply -f taskmanager-session-deployment.yaml
 ```
 ```
-python beam_example.py
+kubectl apply -f beam_wordcount_py.yaml
 ```
 
 ## Monitor Jobs
@@ -50,3 +50,8 @@ kubectl port-forward <service/flink-jobmanager> 8081:8081
 ```
 
 open [localhost:8081](http://localhost:8081) for Flink dashboard
+
+## Shutdown Job
+```
+kubectl detele -f beam_wordcount_py.yaml
+```
