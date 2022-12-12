@@ -1,0 +1,40 @@
+apiVersion: flink.apache.org/v1beta1
+kind: FlinkDeployment
+metadata:
+  namespace: default
+  name: beam-flink-cluster
+spec:
+  image: flink:1.14.6
+  flinkVersion: v1_14
+  serviceAccount: flink
+  flinkConfiguration:
+    taskmanager.numberOfTaskSlots: 2
+    parallelism.default: 2
+  jobManager:
+    resource:
+      memory: "1024m"
+      cpu: 1
+  taskManager:
+    resource:
+      memory: "1024m"
+      cpu: 1
+    replicas: 2
+    podTemplate:
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        name: beam-task-manager-pod-template
+      spec:
+        initContainers:
+          # Beam sidecar container
+          - name: beam-worker-pool
+            image: apache/beam_python3.9_sdk:2.43.0
+            args: ["--worker_pool"]
+            ports:
+            - containerPort: 50000
+              name: pool
+            livenessProbe:
+              tcpSocket:
+                port: 50000
+              initialDelaySeconds: 30
+              periodSeconds: 60
