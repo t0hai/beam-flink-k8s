@@ -1,0 +1,31 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: beam-flink-eks
+  region: ${AWS_REGION}
+# All workloads in the "fargate" Kubernetes namespace will be scheduled onto Fargate
+fargateProfiles:
+  - name: fp-default
+    selectors:
+      - namespace: fargate
+# https://eksctl.io/usage/schema/
+managedNodeGroups:
+  - name: eks-dev-t3-small
+    instanceType: t3.small
+    minSize: 1
+    maxSize: 3
+    desiredCapacity: 3
+    volumeSize: 20
+    iam:
+      withAddonPolicies:
+        cloudWatch: true
+        albIngress: true
+        ebs: true
+        efs: true
+# Enable envelope encryption for Kubernetes Secrets
+secretsEncryption:
+  keyARN: "${AWS_KMS_KEY_EKS}"
+# Enable CloudWatch logging for Kubernetes components
+cloudWatch:
+  clusterLogging:
+    enableTypes: ["*"]

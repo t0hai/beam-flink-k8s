@@ -8,24 +8,26 @@ spec:
   flinkVersion: v1_14
   serviceAccount: flink
   flinkConfiguration:
-    taskmanager.numberOfTaskSlots: 2
-    parallelism.default: 2
+    jobmanager.rpc.address: beam-flink-cluster
+    taskmanager.numberOfTaskSlots: "2"
+    blob.server.port: "6124"
+    jobmanager.rpc.port: "6123"
+    taskmanager.rpc.port: "6122"
+    queryable-state.proxy.ports: "6125"
+    jobmanager.memory.process.size: "1600m"
+    taskmanager.memory.process.size: "1728m"
+    parallelism.default: "2"
   jobManager:
-    resource:
-      memory: "1024m"
-      cpu: 1
+    replicas: 1
   taskManager:
-    resource:
-      memory: "1024m"
-      cpu: 1
     replicas: 2
     podTemplate:
       apiVersion: v1
       kind: Pod
       metadata:
-        name: beam-task-manager-pod-template
+        name: beam-taskmanager-pod
       spec:
-        initContainers:
+        containers:
           # Beam sidecar container
           - name: beam-worker-pool
             image: apache/beam_python3.9_sdk:2.43.0
