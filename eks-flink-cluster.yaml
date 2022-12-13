@@ -24,7 +24,7 @@ managedNodeGroups:
         efs: true
 # Enable envelope encryption for Kubernetes Secrets
 secretsEncryption:
-  keyARN: "${AWS_KMS_KEY_EKS}"
+  keyARN: ${AWS_KMS_KEY_EKS}
 # Enable CloudWatch logging for Kubernetes components
 cloudWatch:
   clusterLogging:

@@ -32,7 +32,7 @@ kubectl get all
 * [eksctl](https://eksctl.io/introduction/#installation) installed
 
 ### Preparations
-Activate AWS profile if needed:
+Activate AWS profile **if needed**:
 ```
 export AWS_PROFILE=<your_profile>
 ```
@@ -49,9 +49,9 @@ _(create a new customer managed KMS key if needed)_
 export AWS_KMS_KEY_EKS=<your_key_arn>
 ```
 
-Adapt configs in `eks-flink-cluster.yaml` as desired & launch cluster:
+Launch cluster (`envsubst` will substitute the evironment variables in the `.yaml` file for you):
 ```
-eksctl create cluster -f eks-flink-cluster.yaml
+envsubst < eks-flink-cluster.yaml | eksctl create cluster -f -
 ```
 
 Check that your nodes have been created:
@@ -92,9 +92,14 @@ Check that jobmanager and taskmanager deployments & pods are ready:
 kubectl get all
 ```
 
-Submit job:
+Init env variable to point to the endpoint of the jobmanager
 ```
-kubectl apply -f beam_wordcount_py.yaml
+export JOBMANAGER_ENDPOINT=$(k get pods -l app=flink,component=jobmanager -o jsonpath='{.items[].status.podIP}')
+```
+
+Submit job (`envsubst` will substitute the `JOBMANGER_ENDPOINT` for you):
+```
+envsubst < beam_wordcount_py.yaml | kubectl apply -f -
 ```
 
 Monitor jobs by port forwarding and opening [localhost:8081](http://localhost:8081) for Flink dashboard
