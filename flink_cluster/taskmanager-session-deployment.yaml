@@ -36,7 +36,7 @@ spec:
           runAsUser: 9999  # refers to user _flink_ from official flink image, change if necessary
       # sidecar required for Beam
       - name: beam-worker-pool
-        image: apache/beam_python3.9_sdk:2.43.0
+        image: 671024921342.dkr.ecr.eu-central-1.amazonaws.com/python_3.9_beam_sdk_harness
         args: ["--worker_pool"]
         ports:
         - containerPort: 50000

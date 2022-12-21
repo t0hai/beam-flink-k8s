@@ -10,7 +10,7 @@ spec:
     spec:
       containers:
         - name: beam-wordcount-py
-          image: apache/beam_python3.9_sdk:2.43.0
+          image: ${IMAGE_URL}
           command: ["python3"]
           args:
             - "-m"
@@ -20,8 +20,9 @@ spec:
             - "--flink_submit_uber_jar"
             - "--environment_type=EXTERNAL"
             - "--environment_config=localhost:50000"
+            - "--requirements_file=/tmp/requirements.txt"
             - "--input"
-            - "/etc/ucf.conf"
+            - "s3://${S3_BUCKET}/beam/input/shakespeare_kinglear.txt"
             - "--output"
-            - "/tmp/output"
+            - "s3://${S3_BUCKET}/beam/output/shakespeare_kinglear_wordcount"
       restartPolicy: Never

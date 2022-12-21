@@ -19,8 +19,13 @@ spec:
     parallelism.default: "2"
   jobManager:
     replicas: 1
+    resource:
+      memory: "2048m"
+      cpu: 1
   taskManager:
-    replicas: 2
+    resource:
+      memory: "2048m"
+      cpu: 1
     podTemplate:
       apiVersion: v1
       kind: Pod

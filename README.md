@@ -51,7 +51,7 @@ export AWS_KMS_KEY_EKS=<your_key_arn>
 
 Launch cluster (`envsubst` will substitute the evironment variables in the `.yaml` file for you):
 ```
-envsubst < eks-flink-cluster.yaml | eksctl create cluster -f -
+envsubst < flink_cluster/eks-flink-cluster.yaml | eksctl create cluster -f -
 ```
 
 Check that your nodes have been created:
@@ -71,18 +71,18 @@ aws eks update-kubeconfig --name beam-flink-eks
 
 Create configuration and servive definitions:
 ```
-kubectl apply -f flink-configuration-configmap.yaml
+kubectl apply -f flink_cluster/flink-configuration-configmap.yaml
 ```
 ```
-kubectl apply -f jobmanager-service.yaml
+kubectl apply -f flink_cluster/jobmanager-service.yaml
 ```
 
 Launch Jobmanager (orchestrator) and Taskmanager (worker) deployments:
 ```
-kubectl apply -f jobmanager-session-deployment.yaml
+kubectl apply -f flink_cluster/jobmanager-session-deployment.yaml
 ```
 ```
-kubectl apply -f taskmanager-session-deployment.yaml
+kubectl apply -f flink_cluster/taskmanager-session-deployment.yaml
 ```
 
 ## Run Beam job
@@ -99,7 +99,7 @@ export JOBMANAGER_ENDPOINT=$(k get pods -l app=flink,component=jobmanager -o jso
 
 Submit job (`envsubst` will substitute the `JOBMANGER_ENDPOINT` for you):
 ```
-envsubst < beam_wordcount_py.yaml | kubectl apply -f -
+envsubst < beam_jobs/word_count/beam_wordcount_py.yaml | kubectl apply -f -
 ```
 
 Monitor jobs by port forwarding and opening [localhost:8081](http://localhost:8081) for Flink dashboard
@@ -109,16 +109,16 @@ kubectl port-forward <service/flink-jobmanager> 8081:8081
 
 Delete job (if needed):
 ```
-kubectl delete -f beam_wordcount_py.yaml
+kubectl delete -f beam_jobs/word_count/beam_wordcount_py.yaml
 ```
 
 ## Shutdown Cluster
 
 ```
-kubectl delete -f taskmanager-session-deployment.yaml
-kubectl delete -f jobmanager-session-deployment.yaml
-kubectl delete -f jobmanager-service.yaml
-kubectl delete -f flink-configuration-configmap.yaml
+kubectl delete -f flink_cluster/taskmanager-session-deployment.yaml
+kubectl delete -f flink_cluster/jobmanager-session-deployment.yaml
+kubectl delete -f flink_cluster/jobmanager-service.yaml
+kubectl delete -f flink_cluster/flink-configuration-configmap.yaml
 ```
 
 <details>
