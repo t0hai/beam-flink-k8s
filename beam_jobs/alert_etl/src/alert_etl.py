@@ -1,10 +1,11 @@
 import argparse
+import json
 import logging
 import os
 import re
 
 import apache_beam as beam
-from apache_beam.io.fileio import MatchFiles, ReadMatches, WriteToFiles
+from apache_beam.io import WriteToText
 from apache_beam.io.kinesis import ReadDataFromKinesis
 from apache_beam.options.pipeline_options import PipelineOptions, SetupOptions
 
@@ -12,8 +13,8 @@ LOGGER = logging.getLogger()
 DEBUG_LEVEL = os.environ.get('DEBUG_LEVEL', 'INFO')
 LOGGER.setLevel(DEBUG_LEVEL)
 
-AWS_ACCESS_KEY = os.environ.get('AWS_ACCESS_KEY')
-AWS_SECRET_KEY = os.environ.get('AWS_SECRET_KEY')
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
 
 KINESIS_ARN_REGEX = r'arn:aws:kinesis:(?P<region>[^:]+):(?P<account>[^:]+):stream/(?P<stream_name>[^$]+)$'
 
@@ -30,8 +31,8 @@ def read_input(input_source: str):
         stream_name = kinesis_arn_match.group('stream_name')
         res = ReadDataFromKinesis(
             stream_name,
-            aws_access_key=AWS_ACCESS_KEY,
-            aws_secret_key=AWS_SECRET_KEY,
+            aws_access_key=AWS_ACCESS_KEY_ID,
+            aws_secret_key=AWS_SECRET_ACCESS_KEY,
             region=aws_region,
             max_num_records=10,
             max_read_time=10000,
@@ -43,8 +44,11 @@ def read_input(input_source: str):
 
 
 def parse_data(entry):
-    LOGGER.debug(entry)
-    return entry
+    decoded_data = json.loads(entry.decode('utf8'))
+    json_str = json.dumps(decoded_data)
+    print(json_str)
+    LOGGER.debug(json_str)
+    return json_str
 
 
 def run(argv=None, save_main_session=True):
@@ -74,7 +78,8 @@ def run(argv=None, save_main_session=True):
 
     with beam.Pipeline(options=pipeline_options) as p:
         data = (p | read_input(known_args.input))
-        data | WriteToFiles(known_args.output)
+        parsed = (data | beam.Map(parse_data))
+        persisted = (parsed | WriteToText(known_args.output))
 
 
 if __name__ == '__main__':
