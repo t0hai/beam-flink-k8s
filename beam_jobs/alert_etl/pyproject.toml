@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "beam-jobs"
+version = "0.1.0"
+description = "Example project for Beam jobs running on Flink deployed in Kubernetes"
+authors = ["n0rritt <dev.n0rritt@gmail.com>"]
+readme = "README.md"
+packages = [{include = "beam_jobs"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+apache_beam = {version = "2.43.0", extras = ["aws"]}
+
+[tool.poetry.group.dev.dependencies]
+apache_beam = {version = "2.43.0", extras = ["test"]}
+pytest = "^7.2"
+flake8 = "^5.0.3"
+black = "^22.10.0"
+isort = "^5.10.1"
+mypy = "^0.991"
+gitlint = "^0.17.0"
+invoke = "^1.7.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

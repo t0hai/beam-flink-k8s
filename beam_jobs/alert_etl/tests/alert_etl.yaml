@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: alert-etl
+spec:
+  template:
+    metadata:
+      labels:
+        app: alert-etl
+    spec:
+      containers:
+        - name: alert-etl
+          image: ${IMAGE_URL}
+          command: ["python3"]
+          args:
+            - "src/alert_etl.py"
+            - "--runner=DirectRunner"
+            - "--input"
+            - "${KINESIS_ARN}"
+            - "--output"
+            - "${S3_OUTPUT_PATH}"
+      restartPolicy: Never
